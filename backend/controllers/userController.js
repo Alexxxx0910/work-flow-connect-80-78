@@ -2,34 +2,34 @@
 const userModel = require('../models/userModel');
 
 const userController = {
-  // Get all users
+  // Obtener todos los usuarios
   async getAllUsers(req, res) {
     try {
       const users = await userModel.findAllExcept(req.user.userId);
       res.json({ success: true, users });
     } catch (error) {
-      console.error('Error getting users:', error);
-      res.status(500).json({ success: false, message: 'Server error' });
+      console.error('Error al obtener usuarios:', error);
+      res.status(500).json({ success: false, message: 'Error del servidor' });
     }
   },
   
-  // Get user by ID
+  // Obtener usuario por ID
   async getUserById(req, res) {
     try {
       const user = await userModel.findById(req.params.userId);
       
       if (!user) {
-        return res.status(404).json({ success: false, message: 'User not found' });
+        return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
       }
       
       res.json({ success: true, user });
     } catch (error) {
-      console.error('Error getting user:', error);
-      res.status(500).json({ success: false, message: 'Server error' });
+      console.error('Error al obtener usuario:', error);
+      res.status(500).json({ success: false, message: 'Error del servidor' });
     }
   },
   
-  // Update user profile
+  // Actualizar perfil de usuario
   async updateProfile(req, res) {
     try {
       const { username, avatar, bio, skills } = req.body;
@@ -43,8 +43,8 @@ const userController = {
       
       res.json({ success: true, user: updatedUser });
     } catch (error) {
-      console.error('Error updating profile:', error);
-      res.status(500).json({ success: false, message: 'Server error' });
+      console.error('Error al actualizar perfil:', error);
+      res.status(500).json({ success: false, message: 'Error del servidor' });
     }
   }
 };

@@ -17,22 +17,27 @@ export const ChatGroupForm = ({ onClose }: { onClose: () => void }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<UserType[]>([]);
   
+  // Obtener todos los usuarios disponibles
   const allUsers = getAllUsers();
   
+  // Filtrar usuarios basado en el término de búsqueda y excluir ya seleccionados
   const filteredUsers = allUsers.filter(user => 
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
     !selectedUsers.some(selected => selected.id === user.id)
   );
 
+  // Manejar la selección de un usuario
   const handleSelectUser = (user: UserType) => {
     setSelectedUsers(prev => [...prev, user]);
     setSearchTerm('');
   };
   
+  // Manejar la eliminación de un usuario seleccionado
   const handleRemoveUser = (userId: string) => {
     setSelectedUsers(prev => prev.filter(user => user.id !== userId));
   };
   
+  // Manejar la creación del grupo
   const handleCreateGroup = async () => {
     if (selectedUsers.length < 1) {
       toast({
@@ -59,6 +64,7 @@ export const ChatGroupForm = ({ onClose }: { onClose: () => void }) => {
 
   return (
     <div className="p-4 space-y-4">
+      {/* Campo para el nombre del grupo */}
       <div>
         <Label htmlFor="group-name">Nombre del grupo (opcional)</Label>
         <Input
@@ -70,6 +76,7 @@ export const ChatGroupForm = ({ onClose }: { onClose: () => void }) => {
         />
       </div>
       
+      {/* Lista de participantes seleccionados */}
       {selectedUsers.length > 0 && (
         <div>
           <Label>Participantes seleccionados</Label>
@@ -98,6 +105,7 @@ export const ChatGroupForm = ({ onClose }: { onClose: () => void }) => {
         </div>
       )}
       
+      {/* Campo de búsqueda de usuarios */}
       <div>
         <Label htmlFor="search-users">Buscar usuarios</Label>
         <Input
@@ -109,6 +117,7 @@ export const ChatGroupForm = ({ onClose }: { onClose: () => void }) => {
         />
       </div>
       
+      {/* Lista de usuarios filtrados */}
       {searchTerm && (
         <div className="border rounded-md max-h-40 overflow-y-auto">
           {filteredUsers.length === 0 ? (
@@ -138,6 +147,7 @@ export const ChatGroupForm = ({ onClose }: { onClose: () => void }) => {
         </div>
       )}
       
+      {/* Botones de acción */}
       <div className="flex justify-end space-x-2">
         <Button variant="outline" onClick={onClose}>Cancelar</Button>
         <Button 

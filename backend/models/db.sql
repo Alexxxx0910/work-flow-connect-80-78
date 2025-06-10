@@ -1,11 +1,11 @@
 
--- Complete database reset script to fix enum issues
--- This script will completely drop and recreate all job-related tables
+-- Script completo de reseteo de base de datos para solucionar problemas de enum
+-- Este script eliminará completamente y recreará todas las tablas relacionadas con trabajos
 
--- First, disconnect all active connections to avoid locks (optional, run manually if needed)
+-- Primero, desconectar todas las conexiones activas para evitar bloqueos (opcional, ejecutar manualmente si es necesario)
 -- SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'workflowconnect' AND pid <> pg_backend_pid();
 
--- Users Table (keeping existing structure)
+-- Tabla de Usuarios (manteniendo la estructura existente)
 CREATE TABLE IF NOT EXISTS "Users" (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS "Users" (
   "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Files Table (keeping existing structure)
+-- Tabla de Archivos (manteniendo la estructura existente)
 CREATE TABLE IF NOT EXISTS "Files" (
   id SERIAL PRIMARY KEY,
   filename VARCHAR(255) NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS "Files" (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Chats Table (keeping existing structure)
+-- Tabla de Chats (manteniendo la estructura existente)
 CREATE TABLE IF NOT EXISTS "Chats" (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS "Chats" (
   "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Chat Participants Table (keeping existing structure)
+-- Tabla de Participantes de Chat (manteniendo la estructura existente)
 CREATE TABLE IF NOT EXISTS "ChatParticipants" (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   "userId" UUID REFERENCES "Users"(id) ON DELETE CASCADE,
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS "ChatParticipants" (
   UNIQUE("userId", "chatId")
 );
 
--- Messages Table (keeping existing structure)
+-- Tabla de Mensajes (manteniendo la estructura existente)
 CREATE TABLE IF NOT EXISTS "Messages" (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   content TEXT NOT NULL,
@@ -65,20 +65,20 @@ CREATE TABLE IF NOT EXISTS "Messages" (
   "userId" UUID REFERENCES "Users"(id) ON DELETE SET NULL
 );
 
--- COMPLETE RESET OF JOB-RELATED TABLES
--- Drop all dependent tables first
+-- RESETEO COMPLETO DE TABLAS RELACIONADAS CON TRABAJOS
+-- Eliminar primero todas las tablas dependientes
 DROP TABLE IF EXISTS "JobLikes" CASCADE;
 DROP TABLE IF EXISTS "SavedJobs" CASCADE;
 DROP TABLE IF EXISTS "Replies" CASCADE;
 DROP TABLE IF EXISTS "Comments" CASCADE;
 DROP TABLE IF EXISTS "Jobs" CASCADE;
 
--- Drop ALL possible enum types that might exist
+-- Eliminar TODOS los tipos enum posibles que puedan existir
 DROP TYPE IF EXISTS job_status CASCADE;
 DROP TYPE IF EXISTS enum_Jobs_status CASCADE;
 DROP TYPE IF EXISTS "enum_Jobs_status" CASCADE;
 
--- Force drop any remaining enum references
+-- Forzar eliminación de cualquier referencia enum restante
 DO $$ 
 BEGIN
     IF EXISTS (SELECT 1 FROM pg_type WHERE typname = 'job_status') THEN
@@ -92,11 +92,11 @@ BEGIN
     END IF;
 EXCEPTION
     WHEN OTHERS THEN
-        -- Ignore errors if types don't exist
+        -- Ignorar errores si los tipos no existen
         NULL;
 END $$;
 
--- Create Jobs table with VARCHAR status (NO ENUM)
+-- Crear tabla Jobs con estado VARCHAR (SIN ENUM)
 CREATE TABLE "Jobs" (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title VARCHAR(255) NOT NULL,
@@ -111,7 +111,7 @@ CREATE TABLE "Jobs" (
   CONSTRAINT valid_status CHECK (status IN ('open', 'in_progress', 'completed', 'closed'))
 );
 
--- Create Comments table
+-- Crear tabla de Comentarios
 CREATE TABLE "Comments" (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   content TEXT NOT NULL,
@@ -121,7 +121,7 @@ CREATE TABLE "Comments" (
   "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create Replies table
+-- Crear tabla de Respuestas
 CREATE TABLE "Replies" (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   content TEXT NOT NULL,
@@ -131,7 +131,7 @@ CREATE TABLE "Replies" (
   "commentId" UUID REFERENCES "Comments"(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
--- Create Job Likes table
+-- Crear tabla de Me Gusta de Trabajos
 CREATE TABLE "JobLikes" (
   "JobId" UUID REFERENCES "Jobs"(id) ON UPDATE CASCADE ON DELETE CASCADE,
   "UserId" UUID REFERENCES "Users"(id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -140,7 +140,7 @@ CREATE TABLE "JobLikes" (
   PRIMARY KEY ("JobId", "UserId")
 );
 
--- Create Saved Jobs table
+-- Crear tabla de Trabajos Guardados
 CREATE TABLE "SavedJobs" (
   "JobId" UUID REFERENCES "Jobs"(id) ON UPDATE CASCADE ON DELETE CASCADE,
   "UserId" UUID REFERENCES "Users"(id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -149,7 +149,7 @@ CREATE TABLE "SavedJobs" (
   PRIMARY KEY ("JobId", "UserId")
 );
 
--- Create indexes for better performance
+-- Crear índices para mejor rendimiento
 CREATE INDEX IF NOT EXISTS idx_jobs_user_id ON "Jobs"("userId");
 CREATE INDEX IF NOT EXISTS idx_jobs_status ON "Jobs"(status);
 CREATE INDEX IF NOT EXISTS idx_jobs_category ON "Jobs"(category);

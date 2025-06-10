@@ -1,33 +1,34 @@
 
+// Script para resetear las tablas relacionadas con trabajos en la base de datos
 const db = require('../config/database');
 
 async function resetJobTables() {
-  console.log('Starting job tables reset...');
+  console.log('Iniciando el reseteo de las tablas de trabajos...');
   
   try {
-    // Read and execute the SQL script
+    // Leer y ejecutar el script SQL
     const fs = require('fs');
     const path = require('path');
     const sqlScript = fs.readFileSync(path.join(__dirname, '../models/db.sql'), 'utf8');
     
-    // Split by semicolons and execute each statement
+    // Dividir por punto y coma y ejecutar cada declaración
     const statements = sqlScript.split(';').filter(stmt => stmt.trim().length > 0);
     
     for (const statement of statements) {
       if (statement.trim()) {
         try {
-          console.log('Executing:', statement.substring(0, 100) + '...');
+          console.log('Ejecutando:', statement.substring(0, 100) + '...');
           await db.query(statement);
         } catch (error) {
-          // Log but continue - some statements might fail if objects don't exist
-          console.log('Statement failed (this might be normal):', error.message);
+          // Registrar pero continuar - algunas declaraciones pueden fallar si los objetos no existen
+          console.log('La declaración falló (esto podría ser normal):', error.message);
         }
       }
     }
     
-    console.log('Job tables reset completed successfully!');
+    console.log('¡Reseteo de tablas de trabajos completado exitosamente!');
     
-    // Verify the Jobs table structure
+    // Verificar la estructura de la tabla Jobs
     const result = await db.query(`
       SELECT column_name, data_type, is_nullable 
       FROM information_schema.columns 
@@ -35,24 +36,24 @@ async function resetJobTables() {
       ORDER BY ordinal_position
     `);
     
-    console.log('Jobs table structure:');
+    console.log('Estructura de la tabla Jobs:');
     console.table(result.rows);
     
   } catch (error) {
-    console.error('Error resetting job tables:', error);
+    console.error('Error al resetear las tablas de trabajos:', error);
     throw error;
   }
 }
 
-// If this script is run directly
+// Si este script se ejecuta directamente
 if (require.main === module) {
   resetJobTables()
     .then(() => {
-      console.log('Reset script completed successfully');
+      console.log('Script de reseteo completado exitosamente');
       process.exit(0);
     })
     .catch(error => {
-      console.error('Reset script failed:', error);
+      console.error('El script de reseteo falló:', error);
       process.exit(1);
     });
 }

@@ -1,6 +1,6 @@
 
-// This file provides Next.js-like functionality for Vite
-// It's a compatibility layer for components that expect Next.js APIs
+// Este archivo proporciona funcionalidad similar a Next.js para Vite
+// Es una capa de compatibilidad para componentes que esperan APIs de Next.js
 
 declare global {
   interface Window {
@@ -8,7 +8,7 @@ declare global {
   }
 }
 
-// Mock Next.js router for compatibility
+// Mock del router de Next.js para compatibilidad
 export const useRouter = () => ({
   push: (url: string) => window.location.href = url,
   replace: (url: string) => window.location.replace(url),
@@ -20,19 +20,19 @@ export const useRouter = () => ({
   asPath: window.location.pathname + window.location.search,
 });
 
-// Mock Next.js Image component
+// Mock del componente Image de Next.js
 export const Image = ({ src, alt, ...props }: any) => {
   return <img src={src} alt={alt} {...props} />;
 };
 
-// Mock Next.js Link component  
+// Mock del componente Link de Next.js  
 export const Link = ({ href, children, ...props }: any) => {
   return <a href={href} {...props}>{children}</a>;
 };
 
-// Mock Next.js Head component
+// Mock del componente Head de Next.js
 export const Head = ({ children }: any) => {
-  return null; // In a real app, you might want to use react-helmet
+  return null; // En una aplicación real, podrías querer usar react-helmet
 };
 
 export default {};

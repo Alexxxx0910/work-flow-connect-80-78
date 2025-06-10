@@ -5,11 +5,11 @@ const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Public routes
+// Rutas públicas
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 
-// Protected routes
+// Rutas protegidas
 router.get('/verify', authenticateToken, authController.verify);
 
 module.exports = router;
